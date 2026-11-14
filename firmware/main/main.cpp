@@ -31,10 +31,46 @@ static std::vector<Turn> history;
 static constexpr int KV_WINDOW = 72;
 static constexpr int REPLY_LIMIT = 24;
 
-struct ChatResult { std::string text; int prompt_tokens=0, generated=0; int64_t prefill_ms=0, decode_ms=0; bool ok=false; };
+struct ChatResult { std::string text; int prompt_tokens=0, generated=0; int64_t prefill_ms=0, decode_ms=0; bool ok=false, calculator=false; };
+
+static bool try_calculate(const std::string& input, std::string& answer) {
+  const char* p = input.c_str();
+  while (*p && !(*p >= '0' && *p <= '9')) ++p;
+  if (!*p) return false;
+  char* end = nullptr;
+  long long a = strtoll(p, &end, 10);
+  if (end == p || a > 1000000 || a < -1000000) return false;
+  p = end;
+  while (*p == ' ' || *p == '\t') ++p;
+  char op = *p++;
+  if (op != '+' && op != '-' && op != '*' && op != '/' && op != 'x' && op != 'X') return false;
+  while (*p == ' ' || *p == '\t') ++p;
+  long long b = strtoll(p, &end, 10);
+  if (end == p || b > 1000000 || b < -1000000) return false;
+  p = end;
+  while (*p == ' ' || *p == '\t' || *p == '?' || *p == '.' || *p == '!') ++p;
+  if (*p) return false;
+  long long value = 0;
+  switch (op) {
+    case '+': value = a + b; break;
+    case '-': value = a - b; break;
+    case '*': case 'x': case 'X': value = a * b; break;
+    case '/': if (!b || a % b) return false; value = a / b; break;
+    default: return false;
+  }
+  char buf[48];
+  snprintf(buf, sizeof(buf), "%lld", value);
+  answer = buf;
+  return true;
+}
 
 static ChatResult chat(const std::string& user) {
   ChatResult result;
+  if (try_calculate(user, result.text)) {
+    result.ok = true;
+    result.calculator = true;
+    return result;
+  }
   std::vector<std::string> parts;
   for (const auto& turn : history) parts.push_back("User: " + turn.user + "\nBot:" + turn.bot);
   parts.push_back("User: " + user + "\nBot:");
@@ -129,6 +165,7 @@ static esp_err_t chat_handler(httpd_req_t* req) {
   snprintf(generated_tokens, sizeof(generated_tokens), "%d", r.generated);
   snprintf(prefill_ms, sizeof(prefill_ms), "%lld", (long long)r.prefill_ms);
   snprintf(decode_ms, sizeof(decode_ms), "%lld", (long long)r.decode_ms);
+  httpd_resp_set_hdr(req, "X-Reply-Source", r.calculator ? "calculator" : "model");
   httpd_resp_set_hdr(req, "X-Prompt-Tokens", prompt_tokens);
   httpd_resp_set_hdr(req, "X-Generated-Tokens", generated_tokens);
   httpd_resp_set_hdr(req, "X-Prefill-Ms", prefill_ms);
