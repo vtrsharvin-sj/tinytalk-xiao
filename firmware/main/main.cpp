@@ -113,11 +113,17 @@ static esp_err_t chat_handler(httpd_req_t* req) {
   while (!user.empty() && (user.back() == '\n' || user.back() == '\r')) user.pop_back();
   if (user.empty()) { xSemaphoreGive(chat_mutex); httpd_resp_set_status(req, "400 Bad Request"); return httpd_resp_sendstr(req, "Type a message first."); }
   ChatResult r = chat(user);
-  char num[24];
-  snprintf(num, sizeof(num), "%d", r.prompt_tokens); httpd_resp_set_hdr(req, "X-Prompt-Tokens", num);
-  snprintf(num, sizeof(num), "%d", r.generated); httpd_resp_set_hdr(req, "X-Generated-Tokens", num);
-  snprintf(num, sizeof(num), "%lld", (long long)r.prefill_ms); httpd_resp_set_hdr(req, "X-Prefill-Ms", num);
-  snprintf(num, sizeof(num), "%lld", (long long)r.decode_ms); httpd_resp_set_hdr(req, "X-Decode-Ms", num);
+  // httpd_resp_set_hdr may retain the value pointer until the response is sent.
+  // Keep each header value in its own buffer instead of overwriting one shared buffer.
+  char prompt_tokens[16], generated_tokens[16], prefill_ms[24], decode_ms[24];
+  snprintf(prompt_tokens, sizeof(prompt_tokens), "%d", r.prompt_tokens);
+  snprintf(generated_tokens, sizeof(generated_tokens), "%d", r.generated);
+  snprintf(prefill_ms, sizeof(prefill_ms), "%lld", (long long)r.prefill_ms);
+  snprintf(decode_ms, sizeof(decode_ms), "%lld", (long long)r.decode_ms);
+  httpd_resp_set_hdr(req, "X-Prompt-Tokens", prompt_tokens);
+  httpd_resp_set_hdr(req, "X-Generated-Tokens", generated_tokens);
+  httpd_resp_set_hdr(req, "X-Prefill-Ms", prefill_ms);
+  httpd_resp_set_hdr(req, "X-Decode-Ms", decode_ms);
   httpd_resp_set_type(req, "text/plain; charset=utf-8");
   esp_err_t err = httpd_resp_send(req, r.text.c_str(), r.text.size());
   xSemaphoreGive(chat_mutex);
