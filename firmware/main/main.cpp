@@ -93,6 +93,15 @@ static esp_err_t health_handler(httpd_req_t* req) {
   httpd_resp_set_type(req, "application/json");
   return httpd_resp_send(req, body, HTTPD_RESP_USE_STRLEN);
 }
+static esp_err_t reset_handler(httpd_req_t* req) {
+  if (xSemaphoreTake(chat_mutex, pdMS_TO_TICKS(1000)) != pdTRUE) {
+    httpd_resp_set_status(req, "503 Service Unavailable");
+    return httpd_resp_sendstr(req, "The model is busy. Try clearing the chat again shortly.");
+  }
+  history.clear();
+  xSemaphoreGive(chat_mutex);
+  return httpd_resp_sendstr(req, "Conversation cleared.");
+}
 static esp_err_t chat_handler(httpd_req_t* req) {
   if (req->content_len < 1 || req->content_len > 180) {
     httpd_resp_set_status(req, "413 Payload Too Large");
@@ -139,9 +148,11 @@ static void start_web_server() {
   ESP_ERROR_CHECK(httpd_start(&server, &cfg));
   httpd_uri_t page = {.uri="/", .method=HTTP_GET, .handler=page_handler, .user_ctx=nullptr};
   httpd_uri_t health = {.uri="/api/health", .method=HTTP_GET, .handler=health_handler, .user_ctx=nullptr};
+  httpd_uri_t reset = {.uri="/api/reset", .method=HTTP_POST, .handler=reset_handler, .user_ctx=nullptr};
   httpd_uri_t chat_uri = {.uri="/api/chat", .method=HTTP_POST, .handler=chat_handler, .user_ctx=nullptr};
   ESP_ERROR_CHECK(httpd_register_uri_handler(server, &page));
   ESP_ERROR_CHECK(httpd_register_uri_handler(server, &health));
+  ESP_ERROR_CHECK(httpd_register_uri_handler(server, &reset));
   ESP_ERROR_CHECK(httpd_register_uri_handler(server, &chat_uri));
 }
 static void start_access_point() {
