@@ -250,7 +250,9 @@ extern "C" void app_main(void) {
   if (!llm_init_embedded(&model, MODEL_DATA, MODEL_DATA_LEN, KV_WINDOW)) { printf("ERROR: model init failed\n"); vTaskDelete(nullptr); return; }
   if (!llm_tokenizer_from_memory(&tokenizer, TOKENIZER_DATA, TOKENIZER_DATA_LEN, model.config.vocab_size)) { printf("ERROR: tokenizer init failed\n"); vTaskDelete(nullptr); return; }
   if (tokenizer.vocab_size != model.config.vocab_size) { printf("ERROR: model/tokenizer vocab mismatch\n"); vTaskDelete(nullptr); return; }
-  llm_build_sampler(&sampler, model.config.vocab_size, 0.8f, 0.9f, esp_random());
+  // A lower temperature keeps this tiny chat model more focused than the
+  // upstream demo's more varied 0.8 setting while retaining top-p sampling.
+  llm_build_sampler(&sampler, model.config.vocab_size, 0.5f, 0.9f, esp_random());
   chat_mutex = xSemaphoreCreateMutex();
   start_access_point();
   start_web_server();
