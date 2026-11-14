@@ -27,7 +27,7 @@ This repo includes the model/tokenizer data in `firmware/main/` so a build does 
 - TinyTalk-2 quantized Q4_0, embedded in firmware
 - 72-token KV context and up to 24 generated tokens per reply
 - Two concurrent Wi-Fi clients, one inference at a time
-- AP SSID `TinyTalk-XIAO`, passphrase `needlechat`
+- AP SSID `TinyTalk-XIAO`, passphrase `needlechat` (change it in `firmware/main/main.cpp` before sharing)
 
 ## Licenses and attribution
 
@@ -36,5 +36,7 @@ This repo includes the model/tokenizer data in `firmware/main/` so a build does 
 - GPT-2 tokenizer data is included in the model artifacts; see the upstream model card and source notices.
 
 ## GitHub Pages
+
+Live flasher: https://vtrsharvin-sj.github.io/tinytalk-xiao/
 
 GitHub Pages publishes the `docs/` folder directly from the `main` branch. The flasher and factory image are public downloads; the TinyTalk-2 model is licensed for non-commercial use. GitHub Pages is public even if repository visibility changes.
