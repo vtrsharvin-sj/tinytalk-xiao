@@ -1,0 +1,14 @@
+{
+  "name": "TinyTalk XIAO Offline Chat",
+  "version": "1.0.0",
+  "new_install_prompt_erase": true,
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "improv": false,
+      "parts": [
+        { "path": "factory.bin", "offset": 0 }
+      ]
+    }
+  ]
+}
