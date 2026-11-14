@@ -37,4 +37,4 @@ This repo includes the model/tokenizer data in `firmware/main/` so a build does 
 
 ## GitHub Pages
 
-The included Actions workflow deploys the `site/` folder on pushes to `main`. After the first push, enable Pages in repository settings with **GitHub Actions** as the source if GitHub has not enabled it automatically. GitHub Pages is publicly available; the model artifacts are openly downloadable under their non-commercial terms.
+GitHub Pages publishes the `docs/` folder directly from the `main` branch. The flasher and factory image are public downloads; the TinyTalk-2 model is licensed for non-commercial use. GitHub Pages is public even if repository visibility changes.
