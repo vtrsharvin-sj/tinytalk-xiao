@@ -72,11 +72,6 @@ static ChatResult chat(const std::string& user) {
     return result;
   }
   std::vector<std::string> parts;
-  // The model has no native system-role token. Keep this compact instruction
-  // as a short opening exchange in its trained User/Bot format.
-  parts.push_back("User: Stay friendly, brief, and on topic.\nBot: Okay.");
-  parts.push_back("User: Hi!\nBot: Hey! How are you?");
-  parts.push_back("User: I'm fine.\nBot: Glad to hear it!");
   for (const auto& turn : history) parts.push_back("User: " + turn.user + "\nBot:" + turn.bot);
   parts.push_back("User: " + user + "\nBot:");
   int prompt[KV_WINDOW - 2], n = 0;
@@ -96,8 +91,7 @@ static ChatResult chat(const std::string& user) {
       }
       for (int j = 0; j < count; ++j) prompt[n++] = segment[j];
     }
-    // Preserve the instruction and current message; evict oldest chat turns.
-    if (!fit && parts.size() > 2) parts.erase(parts.begin() + 1);
+    if (!fit && parts.size() > 1) parts.erase(parts.begin());
     else if (!fit) break;
   }
   if (!fit || n < 1) { result.text = "Message is too long for the model context."; return result; }
@@ -258,8 +252,7 @@ extern "C" void app_main(void) {
   if (tokenizer.vocab_size != model.config.vocab_size) { printf("ERROR: model/tokenizer vocab mismatch\n"); vTaskDelete(nullptr); return; }
   // A lower temperature keeps this tiny chat model more focused than the
   // upstream demo's more varied 0.8 setting while retaining top-p sampling.
-  // Greedy decoding avoids random topic jumps on this very small model.
-  llm_build_sampler(&sampler, model.config.vocab_size, 0.0f, 0.9f, esp_random());
+  llm_build_sampler(&sampler, model.config.vocab_size, 0.5f, 0.9f, esp_random());
   chat_mutex = xSemaphoreCreateMutex();
   start_access_point();
   start_web_server();
