@@ -74,7 +74,9 @@ static ChatResult chat(const std::string& user) {
   std::vector<std::string> parts;
   // The model has no native system-role token. Keep this compact instruction
   // as a short opening exchange in its trained User/Bot format.
-  parts.push_back("User: Answer me directly, naturally, and on topic. Don't repeat old replies. If unsure, say so.\nBot: Okay.");
+  parts.push_back("User: Stay friendly, brief, and on topic.\nBot: Okay.");
+  parts.push_back("User: Hi!\nBot: Hey! How are you?");
+  parts.push_back("User: I'm fine.\nBot: Glad to hear it!");
   for (const auto& turn : history) parts.push_back("User: " + turn.user + "\nBot:" + turn.bot);
   parts.push_back("User: " + user + "\nBot:");
   int prompt[KV_WINDOW - 2], n = 0;
