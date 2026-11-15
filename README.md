@@ -2,7 +2,7 @@
 
 **Offline chat on a Seeed XIAO ESP32-S3 Sense.** Flash once from the browser; the board starts its own Wi-Fi AP and serves the chat interface. A legacy USB terminal client is included.
 
-> This is a compact educational model demo, not a general-purpose assistant. Responses are short and can be wrong. The bundled TinyTalk-2 model is licensed CC BY-NC-SA 4.0, so this distribution is for non-commercial use only.
+> This is a compact educational model demo, not a general-purpose assistant. Responses are short and can be wrong. The bundled TinyTalk v1 model is fine-tuned with locally generated replies. See [model terms](MODEL-LICENSE.md) before redistribution; the Qwen teacher license restricts use of its materials and derivatives to non-commercial purposes.
 
 ## Quick start
 
@@ -19,24 +19,24 @@ Install Python 3 and PySerial, then run `py legacy/tinychat.py COM9` (replace th
 
 ## Build firmware
 
-This repo includes the model/tokenizer data in `firmware/main/` so a build does not download weights. Install PlatformIO Core and run `pio run -e xiao_sense`. The flash mode is DIO for this board. The current prebuilt image is `site/firmware/factory.bin`; it is also offered by the web flasher.
+The model and tokenizer data are included in `firmware/main/`. With ESP-IDF installed, run `idf.py -C firmware build`. The flash mode is DIO for this board. The current prebuilt image is `docs/firmware/factory.bin`; it is also offered by the web flasher.
 
 ## Device limits
 
 - XIAO ESP32-S3 Sense, 8 MB flash and octal PSRAM
-- TinyTalk-2 quantized Q4_0, embedded in firmware
-- 72-token KV context and up to 24 generated tokens per reply
+- TinyTalk v1 quantized Q4_0, embedded in firmware
+- 80-token KV context and up to 24 generated tokens per reply
 - Two concurrent Wi-Fi clients, one inference at a time
 - AP SSID `TinyTalk-XIAO`, passphrase `needlechat` (change it in `firmware/main/main.cpp` before sharing)
 
 ## Licenses and attribution
 
 - Firmware source: MIT; see [`LICENSE`](LICENSE). Adapted from [TheREZOR/cardputer-ai](https://github.com/TheREZOR/cardputer-ai).
-- TinyTalk-2 model and associated data: [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/), non-commercial. Attribution: [TheREZOR/TinyTalk-2](https://huggingface.co/TheREZOR/TinyTalk-2). The compiled model is embedded in the firmware image and source data.
+- TinyTalk base model: CC BY 4.0, attribution TheREZOR, TinyTalk. The fine-tune also uses replies generated with Qwen2.5-3B-Instruct under its non-commercial Qwen Research License; see [model terms](MODEL-LICENSE.md), [NOTICE](NOTICE), and [license text](QWEN-RESEARCH-LICENSE.txt).
 - GPT-2 tokenizer data is included in the model artifacts; see the upstream model card and source notices.
 
 ## GitHub Pages
 
 Live flasher: https://vtrsharvin-sj.github.io/tinytalk-xiao/
 
-GitHub Pages publishes the `docs/` folder directly from the `main` branch. The flasher and factory image are public downloads; the TinyTalk-2 model is licensed for non-commercial use. GitHub Pages is public even if repository visibility changes.
+GitHub Pages publishes the `docs/` folder directly from the `main` branch. The flasher and factory image are public downloads. GitHub Pages is public even if repository visibility changes.

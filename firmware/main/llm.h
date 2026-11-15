@@ -48,7 +48,7 @@ typedef struct {
   // GPT-Neo path: int4 nibbles with one bf16 scale per 32-element group.
   // Every head (head_size 8 or 16) lies inside a single group, so attention
   // applies one scale per (head, position). ~1 KB/position at dim=256 —
-  // that's what lets a 72-token window fit the 8M model in internal SRAM.
+  // that's what lets a 80-token window fit the 8M model in internal SRAM.
   // Nibble packing: dim i lives in byte i/2 (low nibble if even, high if odd),
   // biased by +8 (stored 1..15, symmetric int4 = clip(round(v/s), ±7)).
   uint8_t*  key_cache4;   // [n_layers, kv_seq_len, kv_dim/2]

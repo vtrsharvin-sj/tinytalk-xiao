@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""USB terminal client for TinyTalk-2 on the XIAO ESP32-S3."""
+"""USB terminal client for TinyTalk v1 on the XIAO ESP32-S3."""
 import argparse
 import sys
 import threading
