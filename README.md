@@ -15,7 +15,7 @@ The Pages site is used to install firmware. Once installed, chat requests go to 
 
 ## USB terminal chat
 
-Install Python 3 and PySerial, then run `py legacy/tinychat.py COM9` (replace the port if needed). Or run `legacy/Chat-TinyTalk2.bat`. Close Arduino Serial Monitor first. Type `/new` to clear the short conversation.
+Install Python 3 and PySerial, then run `py legacy/tinychat.py COM9` (replace the port if needed). Or run `legacy/Chat-TinyTalk2.bat`. Close Arduino Serial Monitor first. Each terminal launch clears stale board conversation history; type `/new` to clear it again.
 
 ## Build firmware
 
