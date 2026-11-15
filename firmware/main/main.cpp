@@ -256,7 +256,8 @@ extern "C" void app_main(void) {
   if (tokenizer.vocab_size != model.config.vocab_size) { printf("ERROR: model/tokenizer vocab mismatch\n"); vTaskDelete(nullptr); return; }
   // A lower temperature keeps this tiny chat model more focused than the
   // upstream demo's more varied 0.8 setting while retaining top-p sampling.
-  llm_build_sampler(&sampler, model.config.vocab_size, 0.2f, 0.9f, esp_random());
+  // Greedy decoding avoids random topic jumps on this very small model.
+  llm_build_sampler(&sampler, model.config.vocab_size, 0.0f, 0.9f, esp_random());
   chat_mutex = xSemaphoreCreateMutex();
   start_access_point();
   start_web_server();
