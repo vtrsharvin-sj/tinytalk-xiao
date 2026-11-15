@@ -31,9 +31,9 @@ This repo includes the model/tokenizer data in `firmware/main/` so a build does 
 
 ## Licenses and attribution
 
-- Firmware source: MIT; see [`LICENSE`](LICENSE). Adapted from [TheREZOR/cardputer-ai](https://github.com/TheREZOR/cardputer-ai).
-- TinyTalk-2 model and associated data: [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/), non-commercial. Attribution: [TheREZOR/TinyTalk-2](https://huggingface.co/TheREZOR/TinyTalk-2). The compiled model is embedded in the firmware image and source data.
-- GPT-2 tokenizer data is included in the model artifacts; see the upstream model card and source notices.
+- Project software source: GNU General Public License v3.0 only (GPL-3.0-only); see [`LICENSE`](LICENSE). Some code is adapted from [TheREZOR/cardputer-ai](https://github.com/TheREZOR/cardputer-ai), which is MIT licensed; its upstream notices remain applicable.
+- TinyTalk-2 model weights and associated training data: [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/), with non-commercial terms. Attribution: [TheREZOR/TinyTalk-2](https://huggingface.co/TheREZOR/TinyTalk-2). These model artifacts, including the embedded model data, are not relicensed under GPL by this repository.
+- GPT-2 tokenizer data is included in the model artifacts; see the upstream model card and source notices. The prebuilt firmware image contains both GPL-licensed software and separately licensed model assets.
 
 ## GitHub Pages
 
