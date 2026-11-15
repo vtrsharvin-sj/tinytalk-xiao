@@ -74,7 +74,7 @@ static ChatResult chat(const std::string& user) {
   std::vector<std::string> parts;
   // The model has no native system-role token. Keep this compact instruction
   // as a short opening exchange in its trained User/Bot format.
-  parts.push_back("User: Be friendly, direct, and brief. Stay on topic. Don't repeat yourself.\nBot: Okay.");
+  parts.push_back("User: Answer me directly, naturally, and on topic. Don't repeat old replies. If unsure, say so.\nBot: Okay.");
   for (const auto& turn : history) parts.push_back("User: " + turn.user + "\nBot:" + turn.bot);
   parts.push_back("User: " + user + "\nBot:");
   int prompt[KV_WINDOW - 2], n = 0;
@@ -256,7 +256,7 @@ extern "C" void app_main(void) {
   if (tokenizer.vocab_size != model.config.vocab_size) { printf("ERROR: model/tokenizer vocab mismatch\n"); vTaskDelete(nullptr); return; }
   // A lower temperature keeps this tiny chat model more focused than the
   // upstream demo's more varied 0.8 setting while retaining top-p sampling.
-  llm_build_sampler(&sampler, model.config.vocab_size, 0.5f, 0.9f, esp_random());
+  llm_build_sampler(&sampler, model.config.vocab_size, 0.2f, 0.9f, esp_random());
   chat_mutex = xSemaphoreCreateMutex();
   start_access_point();
   start_web_server();
