@@ -72,6 +72,9 @@ static ChatResult chat(const std::string& user) {
     return result;
   }
   std::vector<std::string> parts;
+  // The model has no native system-role token. Keep this compact instruction
+  // as a short opening exchange in its trained User/Bot format.
+  parts.push_back("User: Be friendly, direct, and brief. Stay on topic. Don't repeat yourself.\nBot: Okay.");
   for (const auto& turn : history) parts.push_back("User: " + turn.user + "\nBot:" + turn.bot);
   parts.push_back("User: " + user + "\nBot:");
   int prompt[KV_WINDOW - 2], n = 0;
@@ -91,7 +94,8 @@ static ChatResult chat(const std::string& user) {
       }
       for (int j = 0; j < count; ++j) prompt[n++] = segment[j];
     }
-    if (!fit && parts.size() > 1) parts.erase(parts.begin());
+    // Preserve the instruction and current message; evict oldest chat turns.
+    if (!fit && parts.size() > 2) parts.erase(parts.begin() + 1);
     else if (!fit) break;
   }
   if (!fit || n < 1) { result.text = "Message is too long for the model context."; return result; }
