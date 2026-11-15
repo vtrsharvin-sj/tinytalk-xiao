@@ -28,7 +28,7 @@ static Sampler sampler;
 static SemaphoreHandle_t chat_mutex;
 struct Turn { std::string user, bot; };
 static std::vector<Turn> history;
-static constexpr int KV_WINDOW = 80;
+static constexpr int KV_WINDOW = 72;
 static constexpr int REPLY_LIMIT = 24;
 
 struct ChatResult { std::string text; int prompt_tokens=0, generated=0; int64_t prefill_ms=0, decode_ms=0; bool ok=false, calculator=false; };
@@ -125,7 +125,7 @@ static esp_err_t page_handler(httpd_req_t* req) {
   return httpd_resp_send(req, WEB_PAGE, HTTPD_RESP_USE_STRLEN);
 }
 static esp_err_t health_handler(httpd_req_t* req) {
-  const char* body = "{\"device\":\"XIAO ESP32-S3\",\"model\":\"TinyTalk v1\",\"offline\":true}";
+  const char* body = "{\"device\":\"XIAO ESP32-S3\",\"model\":\"TinyTalk-2\",\"offline\":true}";
   httpd_resp_set_type(req, "application/json");
   return httpd_resp_send(req, body, HTTPD_RESP_USE_STRLEN);
 }
@@ -245,14 +245,14 @@ static void serial_terminal_task(void*) {
 }
 
 extern "C" void app_main(void) {
-  printf("\nTinyTalk v1 XIAO ESP32-S3 offline web chat\n");
+  printf("\nTinyTalk-2 XIAO ESP32-S3 offline web chat\n");
   printf("Initializing embedded model (%u KB)...\n", (unsigned)(MODEL_DATA_LEN / 1024));
   if (!llm_init_embedded(&model, MODEL_DATA, MODEL_DATA_LEN, KV_WINDOW)) { printf("ERROR: model init failed\n"); vTaskDelete(nullptr); return; }
   if (!llm_tokenizer_from_memory(&tokenizer, TOKENIZER_DATA, TOKENIZER_DATA_LEN, model.config.vocab_size)) { printf("ERROR: tokenizer init failed\n"); vTaskDelete(nullptr); return; }
   if (tokenizer.vocab_size != model.config.vocab_size) { printf("ERROR: model/tokenizer vocab mismatch\n"); vTaskDelete(nullptr); return; }
   // A lower temperature keeps this tiny chat model more focused than the
   // upstream demo's more varied 0.8 setting while retaining top-p sampling.
-  llm_build_sampler(&sampler, model.config.vocab_size, 0.6f, 0.9f, esp_random());
+  llm_build_sampler(&sampler, model.config.vocab_size, 0.5f, 0.9f, esp_random());
   chat_mutex = xSemaphoreCreateMutex();
   start_access_point();
   start_web_server();
